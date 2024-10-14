@@ -1,13 +1,18 @@
+
+
 <?php if(!isset($conn)){ include 'db_connect.php'; } ?>
 <style>
   textarea{
     resize: none;
   }
 </style>
+
+
+
 <div class="col-lg-12">
-	<div class="card card-outline card-primary">
-		<div class="card-body">
-			<form action="" id="manage-ticket">
+    <div class="card card-outline card-primary">
+        <div class="card-body">
+            <form action="" id="manage-ticket">
         <input type="hidden" name="id" value="<?php echo isset($id) ? $id : '' ?>">
         <div class="row">
           <div class="col-md-12">
@@ -90,28 +95,36 @@
                   <input type="text" class="form-control form-control-sm text-right number" id="change" value="0" readonly="" required>
                 </div>
                 <div class="form-group">
-  <label for="payment_method">Phương Thức Thanh Toán</label>
-  <select name="payment_method" id="payment_method" class="form-control form-control-sm" required>
-    <option value="">-- Chọn --</option>
-    <option value="cash">Tiền mặt</option>
-    <option value="bank_transfer">Chuyển khoản</option>
-    
-  </select>
-</div>
+                  <label for="payment_id">Phương Thức Thanh Toán</label>
+                  <select name="payment_id" id="payment_id" class="form-control form-control-sm" required>
+                    <option value="">-- Chọn --</option>
+                    <option value="2">Tiền mặt</option>
+                    <option value="1">Chuyển khoản</option>
+                  </select>
+                </div>
+                <!-- <div class="form-group">
+                  <label for="payment_status">Trạng Thái Thanh Toán</label>
+                    <select name="payment_status" id="payment_status" class="form-control form-control-sm" required>
+                        <option value="">-- Chọn --</option>
+                        <option value="1">Đã Thanh Toán</option>
+                        <option value="2">Chờ Thanh Toán</option>
+                        <option value="3">Hủy</option>
+                    </select>
+              </div> -->
 
               </div>
             </div>
           </div>
         </div>
       </form>
-  	</div>
-  	<div class="card-footer border-top border-info">
-  		<div class="d-flex w-100 justify-content-center align-items-center">
-  			<button class="btn btn-flat bg-gradient-primary mx-2" form="manage-ticket">Lưu</button>
-  			<a class="btn btn-flat bg-gradient-secondary mx-2" href="./index.php?page=ticket_list">Hủy</a>
-  		</div>
-  	</div>
-	</div>
+      </div>
+      <div class="card-footer border-top border-info">
+          <div class="d-flex w-100 justify-content-center align-items-center">
+              <button class="btn btn-flat bg-gradient-primary mx-2" form="manage-ticket">Lưu</button>
+              <a class="btn btn-flat bg-gradient-secondary mx-2" href="./index.php?page=ticket_list">Hủy</a>
+          </div>
+      </div>
+    </div>
 </div>
 <script>
   $('#pricing_id').change(function(){
@@ -159,9 +172,9 @@
     $('#pricing_id').trigger('change')
     $('[name="no_child"],[name="no_adult"]').trigger('keyup')
   })
-	$('#manage-ticket').submit(function(e){
-		e.preventDefault()
-		start_load()
+    $('#manage-ticket').submit(function(e){
+        e.preventDefault()
+        start_load()
     $('#msg').html('')
     var amount = $('#amount').val();
     var tendered = $('#tendered').val();
@@ -175,30 +188,30 @@
         return false;
       }
       
-		$.ajax({
-			url:'ajax.php?action=save_ticket',
-			data: new FormData($(this)[0]),
-		    cache: false,
-		    contentType: false,
-		    processData: false,
-		    method: 'POST',
-		    type: 'POST',
-			success:function(resp){
+        $.ajax({
+            url:'ajax.php?action=save_ticket',
+            data: new FormData($(this)[0]),
+            cache: false,
+            contentType: false,
+            processData: false,
+            method: 'POST',
+            type: 'POST',
+            success:function(resp){
         if(resp){
           resp = JSON.parse(resp)
-  				if(resp.status == 1){
-  					alert_toast('Dữ liệu đã được lưu thành công',"success");
+                  if(resp.status == 1){
+                      alert_toast('Dữ liệu đã được lưu thành công',"success");
             setTimeout(function(){
               location.href = 'index.php?page=ticket_list'
-					},2000)
-  				}else if(resp.status ==2){
+                    },2000)
+                  }else if(resp.status ==2){
             $('#msg').html('<div class="alert alert-danger">Vé cho trò chơi được chọn và vé cho đã tồn tại.</div>')
             end_load()
           }
         }
-			}
-		})
-	})
+            }
+        })
+    })
   function displayImgCover(input,_this) {
       if (input.files && input.files[0]) {
           var reader = new FileReader();
@@ -210,4 +223,3 @@
       }
   }
 </script>
-

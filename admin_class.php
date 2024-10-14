@@ -1,4 +1,9 @@
+
+
 <?php
+
+
+
 session_start();
 ini_set('display_errors', 1);
 Class Action {
@@ -277,60 +282,144 @@ Class Action {
 			return 1;
 		}
 	}
-	function save_ticket(){
+	// function save_ticket(){
+	// 	extract($_POST);
+	// 	$data = "";
+	// 	foreach($_POST as $k => $v){
+	// 		if(!in_array($k, array('id','game_id')) && !is_numeric($k)){
+	// 			if(in_array($k, array('no_adult','no_child','amount','tendered')))
+	// 				$v = str_replace(',', '', $v);
+	// 			if(empty($data)){
+	// 				$data .= " $k='$v' ";
+	// 			}else{
+	// 				$data .= ", $k='$v' ";
+	// 			}
+	// 		}
+	// 	}
+	// 	if(empty($id)){
+	// 		$save = $this->db->query("INSERT INTO ticket_list set $data");
+	// 		if($save)
+	// 			$id = $this->db->insert_id;
+	// 	}else{
+	// 		$save = $this->db->query("UPDATE ticket_list set $data where id = $id");
+	// 	}
+	// 	if($save){
+	// 		$this->db->query("DELETE FROM ticket_items where ticket_id = $id");
+	// 		for($i = 0 ; $i < $no_adult;$i++){
+	// 			$data= " ticket_id = $id ";
+	// 			$data.= ", game_id = '$game_id' ";
+	// 			$data.= ", type = 1 ";
+	// 			$c = 0;
+	// 			while($c==0){
+	// 				$code = sprintf("%'012d",mt_rand(0, 999999999999));
+	// 				$chk = $this->db->query("SELECT * FROM ticket_items where ticket_no = '$code'")->num_rows;
+	// 				if($chk <= 0)
+	// 					$c =1;
+	// 			}
+	// 			$data.= ",  ticket_no= '$code' ";
+	// 			$this->db->query("INSERT INTO ticket_items set $data");
+	// 		}
+	// 		for($i = 0 ; $i < $no_child;$i++){
+	// 			$data= " ticket_id = $id ";
+	// 			$data.= ", game_id = '$game_id' ";
+	// 			$data.= ", type = 2 ";
+	// 			$c = 0;
+	// 			while($c==0){
+	// 				$code = sprintf("%'012d",mt_rand(0, 999999999999));
+	// 				$chk = $this->db->query("SELECT * FROM ticket_items where ticket_no = '$code'")->num_rows;
+	// 				if($chk <= 0)
+	// 					$c =1;
+	// 			}
+	// 			$data.= ",  ticket_no= '$code' ";
+	// 			$this->db->query("INSERT INTO ticket_items set $data");
+	// 		}
+	// 		return json_encode(array('status'=>1,'id'=>$id));
+	// 	}
+	// }
+
+	function save_ticket() {
 		extract($_POST);
 		$data = "";
-		foreach($_POST as $k => $v){
-			if(!in_array($k, array('id','game_id')) && !is_numeric($k)){
-				if(in_array($k, array('no_adult','no_child','amount','tendered')))
+		
+		// Xây dựng chuỗi dữ liệu cho các trường khác trong POST (ngoại trừ 'id', 'game_id' và các trường số)
+		foreach($_POST as $k => $v) {
+			if (!in_array($k, array('id', 'game_id')) && !is_numeric($k)) {
+				// Loại bỏ dấu phẩy khỏi các trường số
+				if (in_array($k, array('no_adult', 'no_child', 'amount', 'tendered'))) {
 					$v = str_replace(',', '', $v);
-				if(empty($data)){
-					$data .= " $k='$v' ";
-				}else{
-					$data .= ", $k='$v' ";
+				}
+				if (empty($data)) {
+					$data .= "$k='$v'";
+				} else {
+					$data .= ", $k='$v'";
 				}
 			}
 		}
-		if(empty($id)){
-			$save = $this->db->query("INSERT INTO ticket_list set $data");
-			if($save)
-				$id = $this->db->insert_id;
-		}else{
-			$save = $this->db->query("UPDATE ticket_list set $data where id = $id");
+	//	var_dump($data);die();
+		// Thêm trạng thái thanh toán vào chuỗi dữ liệu
+		$payment_status = isset($payment_status) ? $payment_status : 'pending'; // Nếu không có payment_status, mặc định là 'pending'
+		//$data .= ", payment_status='$payment_status'";
+	
+		// Kiểm tra xem có ID hay không để quyết định chèn mới hay cập nhật
+		if (empty($id)) {
+			// Chèn dữ liệu mới vào bảng ticket_list
+			
+			$save = $this->db->query("INSERT INTO ticket_list SET $data");
+		
+			if ($save) {
+				$id = $this->db->insert_id; // Lấy ID vừa chèn
+			}
+		} else {
+			// Cập nhật dữ liệu với ID hiện có
+			$save = $this->db->query("UPDATE ticket_list SET $data WHERE id = $id");
+	
 		}
-		if($save){
-			$this->db->query("DELETE FROM ticket_items where ticket_id = $id");
-			for($i = 0 ; $i < $no_adult;$i++){
-				$data= " ticket_id = $id ";
-				$data.= ", game_id = '$game_id' ";
-				$data.= ", type = 1 ";
+	
+		// Xử lý chèn hoặc cập nhật vé người lớn và trẻ em
+		if ($save) {
+			// Xóa các mục vé hiện tại trước khi chèn mới
+			$this->db->query("DELETE FROM ticket_items WHERE ticket_id = $id");
+			
+			// Chèn vé người lớn
+			for ($i = 0; $i < $no_adult; $i++) {
+				$data = "ticket_id = $id";
+				$data .= ", game_id = '$game_id'";
+				$data .= ", type = 1"; // Người lớn
 				$c = 0;
-				while($c==0){
-					$code = sprintf("%'012d",mt_rand(0, 999999999999));
-					$chk = $this->db->query("SELECT * FROM ticket_items where ticket_no = '$code'")->num_rows;
-					if($chk <= 0)
-						$c =1;
+				while ($c == 0) {
+					$code = sprintf("%'012d", mt_rand(0, 999999999999));
+					$chk = $this->db->query("SELECT * FROM ticket_items WHERE ticket_no = '$code'")->num_rows;
+					if ($chk <= 0) {
+						$c = 1;
+					}
 				}
-				$data.= ",  ticket_no= '$code' ";
-				$this->db->query("INSERT INTO ticket_items set $data");
+				$data .= ", ticket_no = '$code'";
+				$this->db->query("INSERT INTO ticket_items SET $data");
 			}
-			for($i = 0 ; $i < $no_child;$i++){
-				$data= " ticket_id = $id ";
-				$data.= ", game_id = '$game_id' ";
-				$data.= ", type = 2 ";
+	
+			// Chèn vé trẻ em
+			for ($i = 0; $i < $no_child; $i++) {
+				$data = "ticket_id = $id";
+				$data .= ", game_id = '$game_id'";
+				$data .= ", type = 2"; // Trẻ em
 				$c = 0;
-				while($c==0){
-					$code = sprintf("%'012d",mt_rand(0, 999999999999));
-					$chk = $this->db->query("SELECT * FROM ticket_items where ticket_no = '$code'")->num_rows;
-					if($chk <= 0)
-						$c =1;
+				while ($c == 0) {
+					$code = sprintf("%'012d", mt_rand(0, 999999999999));
+					$chk = $this->db->query("SELECT * FROM ticket_items WHERE ticket_no = '$code'")->num_rows;
+					if ($chk <= 0) {
+						$c = 1;
+					}
 				}
-				$data.= ",  ticket_no= '$code' ";
-				$this->db->query("INSERT INTO ticket_items set $data");
+				$data .= ", ticket_no = '$code'";
+				$this->db->query("INSERT INTO ticket_items SET $data");
 			}
-			return json_encode(array('status'=>1,'id'=>$id));
+	
+			// Trả về JSON với trạng thái thành công và ID vé
+			return json_encode(array('status' => 1, 'id' => $id));
 		}
 	}
+	
+	
 	function delete_ticket(){
 		extract($_POST);
 		$delete = $this->db->query("DELETE FROM ticket_list where id = $id");

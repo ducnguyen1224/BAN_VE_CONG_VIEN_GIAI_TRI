@@ -31,7 +31,11 @@
 					<?php
 					$i = 1;
 					
-					$qry = $conn->query("SELECT t.*,p.name as ticket_for FROM ticket_list t inner join pricing p on p.id = t.pricing_id order by unix_timestamp(t.date_created) desc ");
+					$qry = $conn->query(" SELECT t.*, p.name AS ticket_for, pay.type AS type FROM ticket_list t INNER JOIN pricing p ON t.pricing_id = p.id
+  left JOIN payment pay ON t.payment_id = pay.id
+    ORDER BY UNIX_TIMESTAMP(t.date_created) DESC
+");
+
 					while($row= $qry->fetch_assoc()):
 					?>
 					<tr>
@@ -41,6 +45,7 @@
 						<td class=""><b><?php echo number_format($row['no_adult']) ?></b></td>
 						<td class=""><b><?php echo number_format($row['no_child']) ?></b></td>
 						<td><p><small><?php echo $row['ticket_for'] ?></small></p></td>
+						<td class=""><b><?php echo ($row['type']) ?></b></td>
 						<td class="text-center">
 		                    <div class="btn-group">
 		                        <a href="index.php?page=edit_ticket&id=<?php echo $row['id'] ?>" class="btn btn-primary btn-flat ">
