@@ -427,19 +427,39 @@ Class Action {
 			return 1;
 		}
 	}
+
 	function get_report(){
 		extract($_POST);
 		$data = array();
-		$get = $this->db->query("SELECT t.*,p.name as ticket_for FROM ticket_list t inner join pricing p on p.id = t.pricing_id where date(t.date_created) between '$date_from' and '$date_to' order by unix_timestamp(t.date_created) desc ");
-		while($row= $get->fetch_assoc()){
-			$row['date_created'] = date("M d, Y",strtotime($row['date_created']));
-			$row['name'] = ucwords($row['name']);
-			$row['adult_price'] = number_format($row['adult_price'],2);
-			$row['child_price'] = number_format($row['child_price'],2);
-			$row['amount'] = number_format($row['amount'],2);
-			$data[]=$row;
-		}
-		return json_encode($data);
+	
+	
+	
+	
+		// Second query
+	// Cập nhật truy vấn SQL để lấy thêm adult_price và child_price từ bảng pricing
+$get = $this->db->query("SELECT t.*, p.name as ticket_for, p.adult_price, p.child_price, pay.type as payment_id
+FROM ticket_list t
+INNER JOIN pricing p ON p.id = t.pricing_id
+LEFT JOIN payment pay ON t.payment_id = pay.id
+WHERE date(t.date_created) BETWEEN '$date_from' AND '$date_to'
+ORDER BY unix_timestamp(t.date_created) DESC");
+
+if ($get === false) {
+// Xử lý lỗi truy vấn
+return json_encode(array('error' => 'Failed to execute query 2'));
+}
+
+while($row = $get->fetch_assoc()){
+$row['date_created'] = date("M d, Y", strtotime($row['date_created']));
+$row['name'] = ucwords($row['name']);
+$row['adult_price'] = isset($row['adult_price']) ? $row['adult_price'] : '0.00'; // Lấy giá vé người lớn
+$row['child_price'] = isset($row['child_price']) ? $row['child_price'] : '0.00'; // Lấy giá vé trẻ em
+$row['payment_id'] = ucwords($row['payment_id']);
+$row['amount'] = number_format($row['amount'], 2);
+$data[] = $row;
+}
+
+return json_encode($data);
 
 	}
 }

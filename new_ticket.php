@@ -45,8 +45,8 @@
                 </select>
               </div>
             </div>
-            <input type="hidden" name="adult_price" value="<?php echo isset($adult_price) ? $adult_price : '' ?>">
-            <input type="hidden" name="child_price" value="<?php echo isset($child_price) ? $child_price : '' ?>">
+           <!-- <input type="hidden" name="adult_price" value="<?php echo isset($adult_price) ? $adult_price : '' ?>"> -->
+            <!-- <input type="hidden" name="child_price" value="<?php echo isset($child_price) ? $child_price : '' ?>"> -->
             <input type="hidden" name="game_id" value="<?php echo isset($game_id) ? $game_id : '' ?>">
             <div class="row">
               <div class="col-sm-6 form-group ">
@@ -134,7 +134,7 @@
         $('[name="adult_price"]').val(data.adult_price)
         $('[name="child_price"]').val(data.child_price)
         $('#aprice').text(parseFloat(data.adult_price).toLocaleString("en-US",{style:"decimal",minimumFractionDigits:2,maximumFractionDigits:2}))
-        $('#cprice').text(parseFloat(data.child_price).toLocaleString("en-US",{style:"decimal",minimumFractionDigits:2,maximumFractionDigits:2}))
+       $('#cprice').text(parseFloat(data.child_price).toLocaleString("en-US",{style:"decimal",minimumFractionDigits:2,maximumFractionDigits:2}))
         $('[name="game_id"]').val(data.game_id)
         calc()
   })
