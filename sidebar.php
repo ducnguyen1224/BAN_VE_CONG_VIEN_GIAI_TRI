@@ -73,7 +73,30 @@
                 </li> 
                 
                 <?php endif; ?>
-                
+                 <!-- Mục khuyens mai-->
+                 <li class="nav-item">
+                    <a href="#" class="nav-link nav-edit_promo">
+                        <i class="nav-icon fas fa-gift"></i>
+                        <p>
+                         Khuyến mãi 
+                            <i class="right fas fa-angle-left"></i>
+                        </p>
+                    </a>
+                    <ul class="nav nav-treeview">
+                        <li class="nav-item">
+                            <a href="./index.php?page=new_promo" class="nav-link nav-new_promo tree-item">
+                                <i class="fas fa-angle-right nav-icon"></i>
+                                <p>Thêm Mới</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="./index.php?page=promo_list" class="nav-link nav-promo_list tree-item">
+                                <i class="fas fa-angle-right nav-icon"></i>
+                                <p>Danh Sách</p>
+                            </a>
+                        </li>
+                    </ul>
+                </li> 
              <!-- Mục Vé -->
 <li class="nav-item">
     <a href="#" class="nav-link nav-edit_ticket">
@@ -122,7 +145,7 @@
                 <!-- Mục Người Dùng -->
                 <li class="nav-item">
                     <a href="#" class="nav-link nav-edit_user">
-                        <i class="nav-icon fas fa-circle-user"></i>
+                        <i class="nav-icon fas fa-user"></i>
                         <p>
                             Người Dùng
                             <i class="right fas fa-angle-left"></i>

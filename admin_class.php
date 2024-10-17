@@ -248,6 +248,58 @@ Class Action {
 			return 1;
 		}
 	}
+	function save_promo(){
+		extract($_POST);
+		$data = "";
+		
+		// Xử lý dữ liệu đầu vào và xây dựng chuỗi truy vấn
+		foreach($_POST as $k => $v){
+			if(!in_array($k, array('id')) && !is_numeric($k)){
+				$v = $this->db->real_escape_string($v); // Tránh SQL injection
+				if(empty($data)){
+					$data .= " $k='$v' ";
+				}else{
+					$data .= ", $k='$v' ";
+				}
+			}
+		}
+		
+		// Kiểm tra xem có ID không, nếu không thì chèn mới, nếu có thì cập nhật
+		if(empty($id)){
+			$save = $this->db->query("INSERT INTO promo SET $data");
+		}else{
+			$id = $this->db->real_escape_string($id); // Thêm bảo mật cho id
+			$save = $this->db->query("UPDATE promo SET $data WHERE id = $id");
+		}
+		
+		// Kiểm tra kết quả lưu
+		if($save){
+			return 1;
+		} else {
+			// Trả về thông báo lỗi nếu lưu thất bại
+			return json_encode(array('status' => 0, 'error' => $this->db->error));
+		}
+	}
+	function delete_promo(){
+		extract($_POST);
+		
+		// Kiểm tra xem ID có tồn tại và hợp lệ không
+		if(!empty($id)){
+			$id = $this->db->real_escape_string($id); // Tránh SQL injection
+			$delete = $this->db->query("DELETE FROM promo WHERE id = $id");
+			
+			// Kiểm tra kết quả của việc xóa
+			if($delete){
+				return 1;
+			} else {
+				// Trả về thông báo lỗi nếu xóa thất bại
+				return json_encode(array('status' => 0, 'error' => $this->db->error));
+			}
+		} else {
+			return json_encode(array('status' => 0, 'error' => 'ID không hợp lệ.'));
+		}
+	}
+	
 	function save_pricing(){
 		extract($_POST);
 		$data = "";

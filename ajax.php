@@ -86,6 +86,16 @@ if($action == 'get_report'){
 	if($get)
 		echo $get;
 }
+if($action == 'save_promo'){
+	$save = $crud->save_promo();
+	if($save)
+		echo $save;
+}
+if($action == 'delete_promo'){
+	$save = $crud->delete_promo();
+	if($save)
+		echo $save;
+}
 ob_end_flush();
 ?>
 <?php
