@@ -24,6 +24,7 @@
 						<th>Vé trẻ em</th>
 						<th>Vé cho</th>
 						<th>Trạng thái</th>
+						<th>Khuyến mãi</th>
 						<th>Hành động</th>
 					</tr>
 				</thead>
@@ -31,11 +32,12 @@
 					<?php
 					$i = 1;
 					
-					$qry = $conn->query(" SELECT t.*, p.name AS ticket_for, pay.type AS type FROM ticket_list t INNER JOIN pricing p ON t.pricing_id = p.id
-  left JOIN payment pay ON t.payment_id = pay.id
-    ORDER BY UNIX_TIMESTAMP(t.date_created) DESC
-");
-
+					$qry = $conn->query(" SELECT t.*, p.name AS ticket_for, pay.type AS type, dis.name_promo AS name_promo FROM ticket_list t INNER JOIN pricing p ON t.pricing_id = p.id
+					left JOIN payment pay ON t.payment_id = pay.id
+					left JOIN promo dis ON t.promo_id = dis.id
+					  ORDER BY UNIX_TIMESTAMP(t.date_created) DESC
+				  ");
+				
 					while($row= $qry->fetch_assoc()):
 					?>
 					<tr>
@@ -46,6 +48,7 @@
 						<td class=""><b><?php echo number_format($row['no_child']) ?></b></td>
 						<td><p><small><?php echo $row['ticket_for'] ?></small></p></td>
 						<td class=""><b><?php echo ($row['type']) ?></b></td>
+						<td class=""><b><?php echo ($row['name_promo']) ?></b></td>
 						<td class="text-center">
 		                    <div class="btn-group">
 		                        <a href="index.php?page=edit_ticket&id=<?php echo $row['id'] ?>" class="btn btn-primary btn-flat ">

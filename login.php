@@ -21,7 +21,7 @@ header("location:index.php?page=home");
 <?php include 'header.php' ?>
 <style>
     body {
-      background-image: url('assets/img/Theme_park.jpg'); 
+      background-image: url('assets/img/Asia-Park.jpg'); 
       background-size: cover;
       background-repeat: no-repeat; 
       background-attachment: fixed; 

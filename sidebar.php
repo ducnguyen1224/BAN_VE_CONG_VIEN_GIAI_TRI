@@ -74,30 +74,38 @@
                 
                 <?php endif; ?>
                 
-                <!-- Mục Vé -->
-                <li class="nav-item">
-                    <a href="#" class="nav-link nav-edit_ticket">
-                        <i class="nav-icon fas fa-ticket-alt"></i>
-                        <p>
-                            Vé
-                            <i class="right fas fa-angle-left"></i>
-                        </p>
-                    </a>
-                    <ul class="nav nav-treeview">
-                        <li class="nav-item">
-                            <a href="./index.php?page=new_ticket" class="nav-link nav-new_ticket tree-item">
-                                <i class="fas fa-angle-right nav-icon"></i>
-                                <p>Thêm Mới</p>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="./index.php?page=ticket_list" class="nav-link nav-ticket_list tree-item">
-                                <i class="fas fa-angle-right nav-icon"></i>
-                                <p>Danh Sách</p>
-                            </a>
-                        </li>
-                    </ul>
-                </li>  
+             <!-- Mục Vé -->
+<li class="nav-item">
+    <a href="#" class="nav-link nav-edit_ticket">
+        <i class="nav-icon fas fa-ticket-alt"></i>
+        <p>
+            Vé
+            <i class="right fas fa-angle-left"></i>
+        </p>
+    </a>
+    <ul class="nav nav-treeview">
+        <li class="nav-item">
+            <a href="./index.php?page=new_ticket" class="nav-link nav-new_ticket tree-item">
+                <i class="fas fa-angle-right nav-icon"></i>
+                <p>Thêm Mới</p>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a href="./index.php?page=ticket_list" class="nav-link nav-ticket_list tree-item">
+                <i class="fas fa-angle-right nav-icon"></i>
+                <p>Danh Sách</p>
+            </a>
+        </li>
+        <!-- New Menu for Printing Tickets -->
+        <li class="nav-item">
+            <a href="./index.php?page=print_ticket" class="nav-link nav-print_ticket tree-item">
+                <i class="fas fa-angle-right nav-icon"></i>
+                <p>In Vé</p>
+            </a>
+        </li>
+    </ul>
+</li>
+
 
                 <?php if ($_SESSION['login_type'] == 1): ?>
                 

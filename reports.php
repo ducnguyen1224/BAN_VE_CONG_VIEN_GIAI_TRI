@@ -35,7 +35,9 @@
 								<th>Vé trẻ em</th>
 								<th>Giá vé trẻ em</th>
 								<th>Tổng số tiền</th>
+								
 								<th>Trạng thái thanh toán </th>
+								<th>Khuyến mãi</th>
 							</tr>
 						</thead>
 						<tbody>
@@ -121,7 +123,9 @@
 							tr.append('<td>' + (resp[k].no_child) + '</td>') // Số vé trẻ em
 							tr.append('<td>' + (resp[k].child_price) + '</td>') // Giá vé trẻ em
 							tr.append('<td class="text-right">' + (resp[k].amount) + '</td>') // Tổng số tiền
-							tr.append('<td>' + (resp[k].payment_id) + '</td>') // Giá vé trẻ em
+							tr.append('<td>' + (resp[k].payment_id) + '</td>') 
+							tr.append('<td>' + (resp[k].promo_id) + '</td>') 
+
 							// Xóa dấu phẩy trong số tiền và chuyển thành số
 							var amount = resp[k].amount.replace(/,/g, '')
 							amount = amount > 0 ? amount : 0;

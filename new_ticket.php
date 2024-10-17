@@ -102,15 +102,22 @@
                     <option value="1">Chuyển khoản</option>
                   </select>
                 </div>
-                <!-- <div class="form-group">
-                  <label for="payment_status">Trạng Thái Thanh Toán</label>
-                    <select name="payment_status" id="payment_status" class="form-control form-control-sm" required>
-                        <option value="">-- Chọn --</option>
-                        <option value="1">Đã Thanh Toán</option>
-                        <option value="2">Chờ Thanh Toán</option>
-                        <option value="3">Hủy</option>
-                    </select>
-              </div> -->
+                <div class="row">
+  <div class="col-sm-6 form-group ">
+    <label for="" class="control-label">Chương Trình Khuyến Mãi</label>
+    <select name="promo_id" id="promo_id" class="form-control form-control-sm">
+      <option value="">-- Không có khuyến mãi --</option>
+      <?php 
+        $promo = $conn->query("SELECT * FROM promo order by name_promo asc");
+        while($row=$promo->fetch_assoc()): 
+      ?>
+      <option value="<?php echo $row['id'] ?>" data-discount="<?php echo $row['discount'] ?>">
+        <?php echo ucwords($row['name_promo']) ?> (Giảm giá: <?php echo $row['discount'] ?>%)
+      </option>
+      <?php endwhile; ?>
+    </select>
+  </div>
+</div>
 
               </div>
             </div>
@@ -145,16 +152,28 @@
     $('#cpax').text(nc)
     calc()
   }
-  function calc(){
-      var aprice = $('#aprice').text() > 0 ? $('#aprice').text() : 0;
-      var cprice = $('#cprice').text() > 0 ? $('#cprice').text() : 0;
-      var apax = $('#apax').text() > 0 ? $('#apax').text() : 0;
-      var cpax = $('#cpax').text() > 0 ? $('#cpax').text() : 0;
+  $('#promo_id').change(function(){
+    var discount = $(this).find(':selected').data('discount') || 0;
+    calc(discount); // truyền giá trị giảm giá vào hàm calc
+});
 
-      var amount = (parseFloat(aprice)*parseFloat(apax)) + (parseFloat(cprice)*parseFloat(cpax))
-        $('#amount').val(parseFloat(amount).toLocaleString("en-US",{style:"decimal",minimumFractionDigits:2,maximumFractionDigits:2}))
-        calc_change()
-  }
+function calc(discount = 0){
+    var aprice = $('#aprice').text() > 0 ? $('#aprice').text() : 0;
+    var cprice = $('#cprice').text() > 0 ? $('#cprice').text() : 0;
+    var apax = $('#apax').text() > 0 ? $('#apax').text() : 0;
+    var cpax = $('#cpax').text() > 0 ? $('#cpax').text() : 0;
+
+    var amount = (parseFloat(aprice) * parseFloat(apax)) + (parseFloat(cprice) * parseFloat(cpax));
+    
+    // Tính giảm giá
+    if(discount > 0) {
+        amount = amount - (amount * (discount / 100));
+    }
+
+    $('#amount').val(parseFloat(amount).toLocaleString("en-US",{style:"decimal",minimumFractionDigits:2,maximumFractionDigits:2}));
+    calc_change();
+}
+
 
   function calc_change(){
       var amount = $('#amount').val();

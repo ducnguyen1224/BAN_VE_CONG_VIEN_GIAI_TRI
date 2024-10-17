@@ -76,6 +76,11 @@ if($action == 'delete_ticket'){
 	if($save)
 		echo $save;
 }
+if($action == 'print_ticket'){
+	$save = $crud->print_ticket();
+	if($save)
+		echo $save;
+}
 if($action == 'get_report'){
 	$get = $crud->get_report();
 	if($get)

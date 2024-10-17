@@ -340,9 +340,12 @@ Class Action {
 	function save_ticket() {
 		extract($_POST);
 		$data = "";
+	
+		// Kiểm tra nếu có chương trình khuyến mãi được chọn
+		$promo_id = isset($promo_id) ? $promo_id : null;
 		
 		// Xây dựng chuỗi dữ liệu cho các trường khác trong POST (ngoại trừ 'id', 'game_id' và các trường số)
-		foreach($_POST as $k => $v) {
+		foreach ($_POST as $k => $v) {
 			if (!in_array($k, array('id', 'game_id')) && !is_numeric($k)) {
 				// Loại bỏ dấu phẩy khỏi các trường số
 				if (in_array($k, array('no_adult', 'no_child', 'amount', 'tendered'))) {
@@ -355,31 +358,33 @@ Class Action {
 				}
 			}
 		}
-	//	var_dump($data);die();
+	
+		// Thêm chương trình khuyến mãi vào chuỗi dữ liệu
+		// if ($promo_id) {
+		// 	$data .= ", promo_id='$promo_id'";
+		// }
+	
 		// Thêm trạng thái thanh toán vào chuỗi dữ liệu
 		$payment_status = isset($payment_status) ? $payment_status : 'pending'; // Nếu không có payment_status, mặc định là 'pending'
-		//$data .= ", payment_status='$payment_status'";
 	
 		// Kiểm tra xem có ID hay không để quyết định chèn mới hay cập nhật
 		if (empty($id)) {
 			// Chèn dữ liệu mới vào bảng ticket_list
-			
 			$save = $this->db->query("INSERT INTO ticket_list SET $data");
-		
+	
 			if ($save) {
 				$id = $this->db->insert_id; // Lấy ID vừa chèn
 			}
 		} else {
 			// Cập nhật dữ liệu với ID hiện có
 			$save = $this->db->query("UPDATE ticket_list SET $data WHERE id = $id");
-	
 		}
 	
 		// Xử lý chèn hoặc cập nhật vé người lớn và trẻ em
 		if ($save) {
 			// Xóa các mục vé hiện tại trước khi chèn mới
 			$this->db->query("DELETE FROM ticket_items WHERE ticket_id = $id");
-			
+	
 			// Chèn vé người lớn
 			for ($i = 0; $i < $no_adult; $i++) {
 				$data = "ticket_id = $id";
@@ -414,10 +419,16 @@ Class Action {
 				$this->db->query("INSERT INTO ticket_items SET $data");
 			}
 	
+			
+	
+			// Cập nhật lại số tiền phải trả
+			$this->db->query("UPDATE ticket_list SET amount = '$amount' WHERE id = $id");
+	
 			// Trả về JSON với trạng thái thành công và ID vé
 			return json_encode(array('status' => 1, 'id' => $id));
 		}
 	}
+	
 	
 	
 	function delete_ticket(){
@@ -437,10 +448,11 @@ Class Action {
 	
 		// Second query
 	// Cập nhật truy vấn SQL để lấy thêm adult_price và child_price từ bảng pricing
-$get = $this->db->query("SELECT t.*, p.name as ticket_for, p.adult_price, p.child_price, pay.type as payment_id
+$get = $this->db->query("SELECT t.*, p.name as ticket_for, p.adult_price, p.child_price, pay.type as payment_id,dis.name_promo as promo_id
 FROM ticket_list t
 INNER JOIN pricing p ON p.id = t.pricing_id
 LEFT JOIN payment pay ON t.payment_id = pay.id
+LEFT JOIN promo dis ON t.promo_id = dis.id
 WHERE date(t.date_created) BETWEEN '$date_from' AND '$date_to'
 ORDER BY unix_timestamp(t.date_created) DESC");
 
@@ -455,6 +467,7 @@ $row['name'] = ucwords($row['name']);
 $row['adult_price'] = isset($row['adult_price']) ? $row['adult_price'] : '0.00'; // Lấy giá vé người lớn
 $row['child_price'] = isset($row['child_price']) ? $row['child_price'] : '0.00'; // Lấy giá vé trẻ em
 $row['payment_id'] = ucwords($row['payment_id']);
+$row['promo_id'] = ucwords($row['promo_id']);
 $row['amount'] = number_format($row['amount'], 2);
 $data[] = $row;
 }
