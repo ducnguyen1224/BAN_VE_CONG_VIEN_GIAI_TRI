@@ -24,7 +24,7 @@
             <div class="row">
               <div class="col-sm-6 form-group ">
                  <!--tao input de nhap mo ta -->
-                <label for="" class="control-label">Mô Tả</label>
+                <label for="" class="control-label">Giảm giá(%)</label>
                 <textarea name="discount" id="" cols="30" rows="3" class="form-control"><?php echo isset($discount) ? $discount : '' ?></textarea>
               </div>
             </div>
@@ -56,7 +56,7 @@
 				if(resp == 1){
 					alert_toast('Dữ liệu đã được lưu thành công',"success");
 					setTimeout(function(){
-              location.href = 'index.php?page=promo_list' /*điều hướng về trang danh sách chuyến đi*/
+              location.href = 'index.php?page=promo_list' /*điều hướng về trang danh sách khuyến mãi */
 					},2000)
 				}
 			}
