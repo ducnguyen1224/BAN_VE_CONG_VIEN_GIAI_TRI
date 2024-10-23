@@ -22,7 +22,7 @@
                 <input name="name" id="" class="form-control form-control-sm" value="<?php echo isset($name) ? $name : '' ?>" required>
               </div>
               <div class="col-sm-6 form-group ">
-                <label for="" class="control-label">Chuyến Đi</label>
+                <label for="" class="control-label">Thể loại vé</label>
                 <select name="game_id" id="game_id" class="form-control form-control-sm select2" required >
                   <option value=""></option>
                   <option value="0" <?php echo isset($game_id) && $game_id == 0 ? "selected" : '' ?>>Không</option>
@@ -39,11 +39,11 @@
 
             <div class="row">
               <div class="col-sm-6 form-group ">
-                <label for="" class="control-label">Giá Người Lớn</label>
+                <label for="" class="control-label">Giá Dành Cho Người Lớn</label>
                 <input name="adult_price" id="" class="form-control form-control-sm number text-right" value="<?php echo isset($adult_price) ? $adult_price : 0 ?>" onfocus="if($(this).val() == 0 ){$(this).select()}" required>
               </div>
               <div class="col-sm-6 form-group ">
-                <label for="" class="control-label">Giá Trẻ Em</label>
+                <label for="" class="control-label">Giá Dành Cho Trẻ Em</label>
                 <input name="child_price" id="" class="form-control form-control-sm number text-right" value="<?php echo isset($child_price) ? $child_price : 0 ?>" onfocus="if($(this).val() == 0 ){$(this).select()}" required>
               </div>
             </div>
@@ -79,7 +79,7 @@
               location.href = 'index.php?page=pricing_list'
 					},2000)
 				}else if(resp ==2){
-          $('#msg').html('<div class="alert alert-danger">Giá vé cho chuyến đi đã chọn đã tồn tại.</div>')
+          $('#msg').html('<div class="alert alert-danger">Giá vé cho trò chơi đã chọn đã tồn tại.</div>')
           end_load()
         }
 			}
