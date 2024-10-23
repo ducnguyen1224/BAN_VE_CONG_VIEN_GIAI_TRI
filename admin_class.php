@@ -334,60 +334,7 @@ Class Action {
 			return 1;
 		}
 	}
-	// function save_ticket(){
-	// 	extract($_POST);
-	// 	$data = "";
-	// 	foreach($_POST as $k => $v){
-	// 		if(!in_array($k, array('id','game_id')) && !is_numeric($k)){
-	// 			if(in_array($k, array('no_adult','no_child','amount','tendered')))
-	// 				$v = str_replace(',', '', $v);
-	// 			if(empty($data)){
-	// 				$data .= " $k='$v' ";
-	// 			}else{
-	// 				$data .= ", $k='$v' ";
-	// 			}
-	// 		}
-	// 	}
-	// 	if(empty($id)){
-	// 		$save = $this->db->query("INSERT INTO ticket_list set $data");
-	// 		if($save)
-	// 			$id = $this->db->insert_id;
-	// 	}else{
-	// 		$save = $this->db->query("UPDATE ticket_list set $data where id = $id");
-	// 	}
-	// 	if($save){
-	// 		$this->db->query("DELETE FROM ticket_items where ticket_id = $id");
-	// 		for($i = 0 ; $i < $no_adult;$i++){
-	// 			$data= " ticket_id = $id ";
-	// 			$data.= ", game_id = '$game_id' ";
-	// 			$data.= ", type = 1 ";
-	// 			$c = 0;
-	// 			while($c==0){
-	// 				$code = sprintf("%'012d",mt_rand(0, 999999999999));
-	// 				$chk = $this->db->query("SELECT * FROM ticket_items where ticket_no = '$code'")->num_rows;
-	// 				if($chk <= 0)
-	// 					$c =1;
-	// 			}
-	// 			$data.= ",  ticket_no= '$code' ";
-	// 			$this->db->query("INSERT INTO ticket_items set $data");
-	// 		}
-	// 		for($i = 0 ; $i < $no_child;$i++){
-	// 			$data= " ticket_id = $id ";
-	// 			$data.= ", game_id = '$game_id' ";
-	// 			$data.= ", type = 2 ";
-	// 			$c = 0;
-	// 			while($c==0){
-	// 				$code = sprintf("%'012d",mt_rand(0, 999999999999));
-	// 				$chk = $this->db->query("SELECT * FROM ticket_items where ticket_no = '$code'")->num_rows;
-	// 				if($chk <= 0)
-	// 					$c =1;
-	// 			}
-	// 			$data.= ",  ticket_no= '$code' ";
-	// 			$this->db->query("INSERT INTO ticket_items set $data");
-	// 		}
-	// 		return json_encode(array('status'=>1,'id'=>$id));
-	// 	}
-	// }
+
 
 	function save_ticket() {
 		extract($_POST);
@@ -395,7 +342,47 @@ Class Action {
 	
 		// Kiểm tra nếu có chương trình khuyến mãi được chọn
 		$promo_id = isset($promo_id) ? $promo_id : null;
+	
+// ajax.php
+if(isset($_GET['action']) && $_GET['action'] == 'login') {
+    $email = $_POST['email'];
+    $password = $_POST['password'];
+    
+    $stmt = $conn->prepare("SELECT * FROM users WHERE email = ?");
+    $stmt->bind_param("s", $email);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    
+    if($result->num_rows > 0) {
+        $row = $result->fetch_assoc();
+        if(password_verify($password, $row['password'])) { // Giả sử password được hash
+            // Set session variables
+            $_SESSION['login_id'] = $row['id'];
+            $_SESSION['user_id'] = $row['id'];  // Thêm user_id
+            $_SESSION['name'] = $row['firstname'] . ' ' . $row['lastname'];
+            $_SESSION['firstname'] = $row['firstname'];
+            $_SESSION['email'] = $row['email'];
+            $_SESSION['login_type'] = $row['type'];
+            
+            // Debug
+            error_log("Login successful. Session data: " . print_r($_SESSION, true));
+            
+            echo 1;
+        } else {
+            echo json_encode([
+                'status' => 0,
+                'msg' => 'Invalid password'
+            ]);
+        }
+    } else {
+        echo json_encode([
+            'status' => 0,
+            'msg' => 'Email not found'
+        ]);
+    }
+}
 		
+
 		// Xây dựng chuỗi dữ liệu cho các trường khác trong POST (ngoại trừ 'id', 'game_id' và các trường số)
 		foreach ($_POST as $k => $v) {
 			if (!in_array($k, array('id', 'game_id')) && !is_numeric($k)) {
@@ -411,15 +398,9 @@ Class Action {
 			}
 		}
 	
-		// Thêm chương trình khuyến mãi vào chuỗi dữ liệu
-		// if ($promo_id) {
-		// 	$data .= ", promo_id='$promo_id'";
-		// }
-	
-		// Thêm trạng thái thanh toán vào chuỗi dữ liệu
+
+		
 		$payment_status = isset($payment_status) ? $payment_status : 'pending'; // Nếu không có payment_status, mặc định là 'pending'
-	
-		// Kiểm tra xem có ID hay không để quyết định chèn mới hay cập nhật
 		if (empty($id)) {
 			// Chèn dữ liệu mới vào bảng ticket_list
 			$save = $this->db->query("INSERT INTO ticket_list SET $data");
@@ -495,36 +476,40 @@ Class Action {
 		extract($_POST);
 		$data = array();
 	
-	
-	
-	
 		// Second query
-	// Cập nhật truy vấn SQL để lấy thêm adult_price và child_price từ bảng pricing
-$get = $this->db->query("SELECT t.*, p.name as ticket_for, p.adult_price, p.child_price, pay.type as payment_id,dis.name_promo as promo_id
-FROM ticket_list t
-INNER JOIN pricing p ON p.id = t.pricing_id
-LEFT JOIN payment pay ON t.payment_id = pay.id
-LEFT JOIN promo dis ON t.promo_id = dis.id
-WHERE date(t.date_created) BETWEEN '$date_from' AND '$date_to'
-ORDER BY unix_timestamp(t.date_created) DESC");
-
-if ($get === false) {
-// Xử lý lỗi truy vấn
-return json_encode(array('error' => 'Failed to execute query 2'));
-}
-
-while($row = $get->fetch_assoc()){
-$row['date_created'] = date("M d, Y", strtotime($row['date_created']));
-$row['name'] = ucwords($row['name']);
-$row['adult_price'] = isset($row['adult_price']) ? $row['adult_price'] : '0.00'; // Lấy giá vé người lớn
-$row['child_price'] = isset($row['child_price']) ? $row['child_price'] : '0.00'; // Lấy giá vé trẻ em
-$row['payment_id'] = ucwords($row['payment_id']);
-$row['promo_id'] = ucwords($row['promo_id']);
-$row['amount'] = number_format($row['amount'], 2);
-$data[] = $row;
-}
-
-return json_encode($data);
-
+		// Cập nhật truy vấn SQL để lấy thêm adult_price và child_price từ bảng pricing
+		$get = $this->db->query("SELECT t.*, 
+										p.name as ticket_for, 
+										p.adult_price, 
+										p.child_price, 
+										pay.type as payment_id,
+										dis.name_promo as promo_id,
+										u.firstname as user_id
+								 FROM ticket_list t
+								 INNER JOIN pricing p ON p.id = t.pricing_id
+								 LEFT JOIN payment pay ON t.payment_id = pay.id
+								 LEFT JOIN promo dis ON t.promo_id = dis.id
+								 LEFT JOIN users u ON t.user_id = u.id
+								 WHERE date(t.date_created) BETWEEN '$date_from' AND '$date_to'
+								 ORDER BY unix_timestamp(t.date_created) DESC");
+	
+		if ($get === false) {
+			// Xử lý lỗi truy vấn
+			return json_encode(array('error' => 'Failed to execute query 2', 'message' => $this->db->error));
+		}
+	
+		while($row = $get->fetch_assoc()){
+			$row['date_created'] = date("M d, Y", strtotime($row['date_created']));
+			$row['name'] = ucwords($row['name']);
+			$row['adult_price'] = isset($row['adult_price']) ? number_format($row['adult_price'], 2) : '0.00'; // Lấy giá vé người lớn
+			$row['child_price'] = isset($row['child_price']) ? number_format($row['child_price'], 2) : '0.00'; // Lấy giá vé trẻ em
+			$row['payment_id'] = ucwords($row['payment_id']);
+			$row['promo_id'] = ucwords($row['promo_id']);
+			$row['user_id'] = ucwords($row['user_id']);
+			$row['amount'] = isset($row['amount']) ? number_format($row['amount'], 2) : '0.00';
+			$data[] = $row;
+		}
+	
+		return json_encode($data);
 	}
-}
+}	

@@ -48,6 +48,7 @@
 								<th>Giá vé trẻ em</th>
 								<th>Trạng thái thanh toán</th>
 								<th>Khuyến mãi</th>	
+								<th>Người bán</th>
 								<th>Tổng số tiền</th>
 							</tr>
 						</thead>
@@ -123,7 +124,9 @@
 							tr.append('<td>' + (resp[k].child_price) + '</td>');
 							tr.append('<td>' + (resp[k].payment_id) + '</td>');
 							tr.append('<td>' + (resp[k].promo_id) + '</td>');
+							tr.append('<td>' + (resp[k].user_id) + '</td>');
 							tr.append('<td>' + (resp[k].amount) + '</td>');
+						
 
 							var amount = parseFloat(resp[k].amount.replace(/,/g, '')) || 0;
 							total += amount;

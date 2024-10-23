@@ -118,6 +118,7 @@
     </select>
   </div>
 </div>
+<input type="hidden" name="user_id" value="<?php echo isset($_SESSION['login_id']) ? $_SESSION['login_id'] : '' ?>">
 
               </div>
             </div>
@@ -191,46 +192,78 @@ function calc(discount = 0){
     $('#pricing_id').trigger('change')
     $('[name="no_child"],[name="no_adult"]').trigger('keyup')
   })
-    $('#manage-ticket').submit(function(e){
-        e.preventDefault()
-        start_load()
-    $('#msg').html('')
+  $('#manage-ticket').submit(function(e){
+    e.preventDefault();
+    start_load();
+    $('#msg').html('');
+
+    // Debug form data
+    var formData = new FormData($(this)[0]);
+    console.log("Form data being submitted:");
+    for (var pair of formData.entries()) {
+        console.log(pair[0]+ ': ' + pair[1]); 
+    }
+
+    // Kiểm tra user_id
+    if(!formData.get('user_id')) {
+        $('#msg').html('<div class="alert alert-danger">Vui lòng đăng nhập để tiếp tục</div>');
+        end_load();
+        return false;
+    }
+
+    // Kiểm tra số tiền
     var amount = $('#amount').val();
     var tendered = $('#tendered').val();
-        amount = amount.replace(/,/g,'')
-        tendered = tendered.replace(/,/g,'')
-        amount = amount > 0 ? amount : 0;
-        tendered = tendered > 0 ? tendered : 0;
-      if(parseFloat(amount) > parseFloat(tendered)){
-        alert_toast("Số tiền đã thanh toán phải lớn hơn hoặc bằng số tiền phải trả.",'error')
-        end_load()
+    amount = amount.replace(/,/g,'');
+    tendered = tendered.replace(/,/g,'');
+    amount = amount > 0 ? amount : 0;
+    tendered = tendered > 0 ? tendered : 0;
+
+    if(parseFloat(amount) > parseFloat(tendered)){
+        alert_toast("Số tiền đã thanh toán phải lớn hơn hoặc bằng số tiền phải trả.",'error');
+        end_load();
         return false;
-      }
-      
-        $.ajax({
-            url:'ajax.php?action=save_ticket',
-            data: new FormData($(this)[0]),
-            cache: false,
-            contentType: false,
-            processData: false,
-            method: 'POST',
-            type: 'POST',
-            success:function(resp){
-        if(resp){
-          resp = JSON.parse(resp)
-                  if(resp.status == 1){
-                      alert_toast('Dữ liệu đã được lưu thành công',"success");
-            setTimeout(function(){
-              location.href = 'index.php?page=ticket_list'
-                    },2000)
-                  }else if(resp.status ==2){
-            $('#msg').html('<div class="alert alert-danger">Vé cho trò chơi được chọn và vé cho đã tồn tại.</div>')
-            end_load()
-          }
-        }
+    }
+
+    $.ajax({
+        url: 'ajax.php?action=save_ticket',
+        data: formData,
+        cache: false,
+        contentType: false,
+        processData: false,
+        method: 'POST',
+        success: function(resp){
+            try {
+                if(resp) {
+                    resp = JSON.parse(resp);
+                    if(resp.status == 1){
+                        alert_toast('Dữ liệu đã được lưu thành công',"success");
+                        setTimeout(function(){
+                            location.href = 'index.php?page=ticket_list'
+                        }, 2000);
+                    } else if(resp.status == 2){
+                        $('#msg').html('<div class="alert alert-danger">Vé cho trò chơi được chọn và vé cho đã tồn tại.</div>');
+                    } else if(resp.status == 0){
+                        $('#msg').html('<div class="alert alert-danger">' + resp.msg + '</div>');
+                    }
+                }
+            } catch(e) {
+                console.error("Error parsing response:", e, resp);
+                $('#msg').html('<div class="alert alert-danger">Có lỗi xảy ra khi xử lý phản hồi từ máy chủ</div>');
             }
-        })
-    })
+            end_load();
+        },
+        error: function(xhr, status, error) {
+            console.error("Ajax error:", error);
+            $('#msg').html('<div class="alert alert-danger">Có lỗi khi gửi yêu cầu đến máy chủ</div>');
+            end_load();
+        }
+    });
+    // Thêm vào script sau khi login thành công
+$.get('check_session.php', function(data) {
+    console.log('Session after login:', data);
+});
+});
   function displayImgCover(input,_this) {
       if (input.files && input.files[0]) {
           var reader = new FileReader();

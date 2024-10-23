@@ -1,20 +1,14 @@
-<?php include'db_connect.php' ?>
+
+<?php include 'db_connect.php' ?>
 <div class="col-lg-12">
 	<div class="card card-outline card-primary">
 		<div class="card-header">
 			<div class="card-tools">
-				<a class="btn btn-block btn-sm btn-default btn-flat border-primary " href="./index.php?page=new_ticket"><i class="fa fa-plus"></i> Thêm mới</a>
+				<a class="btn btn-block btn-sm btn-default btn-flat border-primary" href="./index.php?page=new_ticket"><i class="fa fa-plus"></i> Thêm mới</a>
 			</div>
 		</div>
 		<div class="card-body">
 			<table class="table tabe-hover table-bordered" id="list">
-				<!-- <colgroup>
-					<col width="5%">
-					<col width="15%">
-					<col width="25%">
-					<col width="25%">
-					<col width="15%">
-				</colgroup> -->
 				<thead>
 					<tr>
 						<th class="text-center">#</th>
@@ -25,30 +19,39 @@
 						<th>Vé cho</th>
 						<th>Trạng thái</th>
 						<th>Khuyến mãi</th>
+						<th>Người bán</th>
 						<th>Hành động</th>
+						
 					</tr>
 				</thead>
 				<tbody>
 					<?php
 					$i = 1;
 					
-					$qry = $conn->query(" SELECT t.*, p.name AS ticket_for, pay.type AS type, dis.name_promo AS name_promo FROM ticket_list t INNER JOIN pricing p ON t.pricing_id = p.id
-					left JOIN payment pay ON t.payment_id = pay.id
-					left JOIN promo dis ON t.promo_id = dis.id
-					  ORDER BY UNIX_TIMESTAMP(t.date_created) DESC
-				  ");
-				
-					while($row= $qry->fetch_assoc()):
+					$qry = $conn->query("SELECT t.*, p.name AS ticket_for, pay.type AS type, dis.name_promo AS name_promo, u.firstname as firstname 
+FROM ticket_list t 
+INNER JOIN pricing p ON t.pricing_id = p.id
+LEFT JOIN payment pay ON t.payment_id = pay.id
+LEFT JOIN promo dis ON t.promo_id = dis.id
+LEFT JOIN users u ON t.user_id = u.id
+ORDER BY UNIX_TIMESTAMP(t.date_created) DESC
+");
+
+					if (!$qry) {
+					    echo "Query Error: " . $conn->error;
+					} else {
+						while ($row = $qry->fetch_assoc()):
 					?>
 					<tr>
 						<td class="text-center"><?php echo $i++ ?></td>
-						<td class=""><b><?php echo date("M d, Y h:i A",strtotime($row['date_created'])) ?></b></td>
+						<td class=""><b><?php echo date("M d, Y h:i A", strtotime($row['date_created'])) ?></b></td>
 						<td class=""><b><?php echo ucwords($row['name']) ?></b></td>
 						<td class=""><b><?php echo number_format($row['no_adult']) ?></b></td>
 						<td class=""><b><?php echo number_format($row['no_child']) ?></b></td>
 						<td><p><small><?php echo $row['ticket_for'] ?></small></p></td>
 						<td class=""><b><?php echo ($row['type']) ?></b></td>
 						<td class=""><b><?php echo ($row['name_promo']) ?></b></td>
+						<td class=""><b><?php echo ($row['firstname']) ?></b></td>
 						<td class="text-center">
 		                    <div class="btn-group">
 		                        <a href="index.php?page=edit_ticket&id=<?php echo $row['id'] ?>" class="btn btn-primary btn-flat ">
@@ -60,7 +63,7 @@
 	                      </div>
 						</td>
 					</tr>	
-				<?php endwhile; ?>
+					<?php endwhile; } ?>
 				</tbody>
 			</table>
 		</div>
