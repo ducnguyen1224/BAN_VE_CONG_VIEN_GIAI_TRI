@@ -71,9 +71,7 @@
                         </li>
                     </ul>
                 </li> 
-                
-                <?php endif; ?>
-                 <!-- Mục khuyens mai-->
+                     <!-- Mục khuyens mai-->
                  <li class="nav-item">
                     <a href="#" class="nav-link nav-edit_promo">
                         <i class="nav-icon fas fa-gift"></i>
@@ -98,6 +96,8 @@
                     </ul>
                 </li> 
              <!-- Mục Vé -->
+                <?php endif; ?>
+            
 <li class="nav-item">
     <a href="#" class="nav-link nav-edit_ticket">
         <i class="nav-icon fas fa-ticket-alt"></i>
