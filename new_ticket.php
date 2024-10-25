@@ -70,12 +70,12 @@
                   <tbody>
                     <tr>
                       <th>Người Lớn</th>
-                      <td class="text-right" id="aprice">0.00</td>
+                      <td class="text-right" id="aprice">0.000</td>
                       <td class="text-right" id="apax">0</td>
                     </tr>
                     <tr>
                       <th>Trẻ Em</th>
-                      <td class="text-right" id="cprice">0.00</td>
+                      <td class="text-right" id="cprice">0.000</td>
                       <td class="text-right" id="cpax">0</td>
                     </tr>
                   </tbody>
@@ -106,13 +106,15 @@
   <div class="col-sm-6 form-group ">
     <label for="" class="control-label">Chương Trình Khuyến Mãi</label>
     <select name="promo_id" id="promo_id" class="form-control form-control-sm">
-      <option value="">-- Không có khuyến mãi --</option>
+      <option value="1">-- Không có khuyến mãi --</option>
       <?php 
-        $promo = $conn->query("SELECT * FROM promo order by name_promo asc");
+       $promo = $conn->query("SELECT * FROM promo WHERE end_date >= CURDATE() OR end_date IS NULL order by name_promo asc");
         while($row=$promo->fetch_assoc()): 
       ?>
-      <option value="<?php echo $row['id'] ?>" data-discount="<?php echo $row['discount'] ?>">
-        <?php echo ucwords($row['name_promo']) ?> (Giảm giá: <?php echo $row['discount'] ?>%)
+      <option value="<?php echo $row['id'] ?>" data-discount="<?php echo $row['discount'] ?>" data-end-date="<?php echo $row['end_date'] ?>">
+    <?php echo ucwords($row['name_promo']) ?> (Giảm giá: <?php echo $row['discount'] ?>%)
+</option>
+
       </option>
       <?php endwhile; ?>
     </select>
@@ -155,8 +157,19 @@
   }
   $('#promo_id').change(function(){
     var discount = $(this).find(':selected').data('discount') || 0;
-    calc(discount); // truyền giá trị giảm giá vào hàm calc
+    var endDate = $(this).find(':selected').data('end-date');
+    var currentDate = new Date().toISOString().split('T')[0]; // Lấy ngày hiện tại
+
+    // Kiểm tra nếu khuyến mãi đã hết hạn
+    if (endDate && currentDate > endDate) {
+        alert("Chương trình khuyến mãi này đã hết hạn.");
+        $('#promo_id').val(''); // Xóa lựa chọn khuyến mãi
+        return;
+    }
+
+    calc(discount); // Tính lại số tiền phải trả với giảm giá
 });
+
 
 function calc(discount = 0){
     var aprice = $('#aprice').text() > 0 ? $('#aprice').text() : 0;
@@ -274,4 +287,4 @@ $.get('check_session.php', function(data) {
           reader.readAsDataURL(input.files[0]);
       }
   }
-</script>
+</script> 

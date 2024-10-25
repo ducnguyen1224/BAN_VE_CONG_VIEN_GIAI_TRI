@@ -54,7 +54,7 @@
 						</thead>
 						<tbody></tbody>
 						<tfoot>
-							<th colspan="10">Tổng doanh số</th>
+							<th colspan="11">Tổng doanh số</th>
 							<th id="total" class="text-right"></th>
 						</tfoot>
 					</table>

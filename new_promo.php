@@ -27,7 +27,16 @@
                 <label for="" class="control-label">Giảm giá(%)</label>
                 <textarea name="discount" id="" cols="30" rows="3" class="form-control"><?php echo isset($discount) ? $discount : '' ?></textarea>
               </div>
+                 <div class="form-group">
+        <label for="create_date">Ngày bắt đầu</label>
+        <input type="datetime-local" class="form-control" name="create_date" required>
+    </div>
+    <div class="form-group">
+        <label for="end_date">Ngày kết thúc</label>
+        <input type="datetime-local" class="form-control" name="end_date" required>
+    </div>
             </div>
+            
           </div>
         </div>
       </form>
